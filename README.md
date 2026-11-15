@@ -238,6 +238,13 @@ python -m playwright install chromium
 
 ---
 
+## 🔗 配套仓库
+
+- **双板通讯 & 原生积木**：<https://github.com/oficeroes/WER-2026-Dual-Board>
+  —— 两块 SKCON9 的 WiFi TCP、4 个原生积木、积木自定义与安装步骤。
+
+---
+
 ## 📜 版权与致谢
 
 - 官方场地图、赛规 PDF：版权归赛事主办方 / 能力风暴所有；本仓库仅用于本队学习与比赛准备。
