@@ -25,7 +25,9 @@
 
 ## 🚀 3 秒上手
 
-**双击 `index.html`**（或 `打开小助手.cmd`）即可。
+**在线打开：** <https://oficeroes.github.io/WER-2026-Map-Assistant/>
+
+**离线打开：** 双击 `index.html`（或 `打开小助手.cmd`）即可。
 
 - 不需要联网
 - 不需要安装 Python / Node
