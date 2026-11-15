@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>WER 2026 · 赛规 &amp; 场地小助手</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-kicker">WER 2026 · 积木教育机器人普及赛 · 伙伴机器人</div>
+      <h1>赛规 &amp; 场地小助手</h1>
+      <p class="hero-sub">把 <b>220 × 120 cm</b> 的场地图、<b>10 个模型位</b>、<b>7 个任务</b>和 <b>180 秒</b>的计分规则，放进一个可以点的页面。</p>
+      <div class="hero-chips">
+        <span>📐 220 × 120 cm</span>
+        <span>🎯 10 个模型位</span>
+        <span>🧩 7 个任务</span>
+        <span>⏱ 180 秒</span>
+        <span>🏥 医院 / 健康场景</span>
+      </div>
+    </div>
+    <div class="hero-card">
+      <div class="hero-card-title">怎么用 · 30 秒</div>
+      <ol>
+        <li>在右侧任务行点一下 <b>任务名</b>；</li>
+        <li>再点地图上的 <b>01–10 圆点</b>，任务就分配到这个模型位；</li>
+        <li>看右上角 <b>预计得分</b> 和依赖提醒。</li>
+      </ol>
+      <div class="hero-card-note">不需要联网，不需要安装。双击 <code>index.html</code> 即可。</div>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="页面导航">
+  <div class="tabs-inner">
+    <button class="tab active" data-tab="map" aria-selected="true">🗺️ 地图</button>
+    <button class="tab" data-tab="tasks" aria-selected="false">🧮 任务与计分</button>
+    <button class="tab" data-tab="rules" aria-selected="false">📖 赛规速查</button>
+    <button class="tab" data-tab="data" aria-selected="false">📊 数据与来源</button>
+  </div>
+</nav>
+
+<main class="page">
+
+  <!-- ============================ 地图 ============================ -->
+  <section class="tab-panel active" id="panel-map">
+    <div class="map-layout">
+      <div class="card map-card">
+        <div class="card-head">
+          <div>
+            <h2>场地地图</h2>
+            <p>官方场地图 + 22 节点 / 21 条边 / 10 个模型位。圆点是模型位，虚线是脱线段。</p>
+          </div>
+          <div class="map-tools" aria-label="地图图层">
+            <label><input type="checkbox" id="show-lines" checked> 引导线</label>
+            <label><input type="checkbox" id="show-free" checked> 脱线段</label>
+            <label><input type="checkbox" id="show-nodes"> 节点名</label>
+          </div>
+        </div>
+        <div class="map-stage" id="map-stage">
+          <img id="map-img" src="assets/地图.jpg" alt="WER 2026 官方场地图">
+          <svg id="map-svg" viewBox="0 0 1265 696" role="img" aria-label="场地地图与模型位"></svg>
+        </div>
+        <div class="map-legend" id="map-legend"></div>
+        <div class="map-caption">
+          <span>底图：官方场地图 <code>地图.jpg</code></span>
+          <span>编号 01–10 = 模型位；颜色 = 当前分配的任务</span>
+          <span>灰色虚线 = 没有任务</span>
+        </div>
+      </div>
+
+      <aside class="side">
+        <div class="card stats-card">
+          <div class="stat-grid">
+            <div class="stat"><b>220 × 120</b><span>场地 cm</span></div>
+            <div class="stat"><b>30 × 30</b><span>基地 cm</span></div>
+            <div class="stat"><b>2.5</b><span>引导线宽 cm</span></div>
+            <div class="stat"><b>3</b><span>段线网</span></div>
+          </div>
+          <div class="score-strip">
+            <span>预计得分</span>
+            <b id="mini-score">700</b>
+            <span class="score-strip-max">/ 700</span>
+            <span class="score-strip-warn" id="mini-warning"></span>
+          </div>
+        </div>
+
+        <div class="card" id="slot-card">
+          <div class="card-head compact">
+            <div>
+              <h2>模型位</h2>
+              <p>点地图上的 01–10 查看详情</p>
+            </div>
+            <button class="mini-btn" id="clear-selection" type="button">取消选中</button>
+          </div>
+          <div class="slot-body" id="slot-body">
+            <div class="empty-state">
+              <div class="empty-icon">👆</div>
+              <p>还没有选中模型位。</p>
+              <p class="muted">先点右侧任务名，再点地图圆点，可以直接分配。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card task-card">
+          <div class="card-head compact">
+            <div>
+              <h2>任务 → 模型位</h2>
+              <p>点任务名选中；下拉可直接改</p>
+            </div>
+            <div class="head-actions">
+              <button class="mini-btn" id="reset-example" type="button">示例</button>
+              <button class="mini-btn" id="clear-assign" type="button">清空</button>
+            </div>
+          </div>
+          <div class="task-list" id="task-list"></div>
+          <p class="tiny-note">示例分配：T1=03 · T2=05 · T3=09 · T4=07 · S1=01 · S2=04 · S3=10（仅演示，比赛以现场公布为准）</p>
+        </div>
+
+        <div class="card score-card">
+          <div class="card-head compact">
+            <div>
+              <h2>预计得分</h2>
+              <p>只算任务/出发/返回/自主，不含超时与犯规</p>
+            </div>
+            <span class="score-max">/ 700</span>
+          </div>
+          <div class="score-top">
+            <strong id="score-total">0</strong>
+            <span>分</span>
+          </div>
+          <div class="progress" aria-hidden="true"><i id="score-bar"></i></div>
+          <div class="score-breakdown" id="score-breakdown"></div>
+          <div class="score-settings">
+            <label><input type="checkbox" data-setting="start" checked> 出发 30</label>
+            <label><input type="checkbox" data-setting="returned" checked> 返回 30</label>
+            <label><input type="checkbox" data-setting="pill" checked> 药丸已带回</label>
+            <label class="restart-label">重启 <input type="number" data-setting="restarts" min="0" max="4" value="0"></label>
+          </div>
+          <div class="warn-list" id="score-warnings"></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============================ 任务与计分 ============================ -->
+  <section class="tab-panel" id="panel-tasks">
+    <div class="two-col">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2>7 个任务</h2>
+            <p>4 个预设任务 + 3 个现场任务（赛前 90 分钟公布）。</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table task-table">
+            <thead><tr><th>任务</th><th>分数</th><th>模型位</th><th>状态</th><th>依赖 / 说明</th><th></th></tr></thead>
+            <tbody id="task-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-head"><div><h2>计分明细</h2><p>改模型位/勾选后实时更新</p></div></div>
+          <div class="score-detail" id="score-detail"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h2>跨任务依赖（最容易丢分）</h2></div></div>
+          <div class="dep-flow">
+            <span class="dep-step">① 取药点<br><small>药丸掉入药框 +50</small></span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-step">② 回基地交付<br><small>药丸随车回基地 +50</small></span>
+            <span class="dep-arrow">→</span>
+            <span class="dep-step">③ 用药点<br><small>开盖 +50；放药丸 +50</small></span>
+          </div>
+          <p class="dep-note">如果跳过“回基地交付”，用药提醒最多只能拿 50 分。路线顺序必须是：<b>T2 取药 → 回基地 → T3 用药</b>。</p>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h2>现场 5 分钟流程</h2></div></div>
+          <ol class="steps">
+            <li>拿到“任务 → 模型位”的分配表。</li>
+            <li>在这个页面把 7 个任务的下拉框选好，看地图是否冲突。</li>
+            <li>看预计得分与依赖提醒，决定做哪些、跳过哪些。</li>
+            <li>把路线/程序写好后，按模型位和朝向核对动作。</li>
+            <li>上场前确认出发、返回、重启次数和药丸交付。</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 赛规速查 ============================ -->
+  <section class="tab-panel" id="panel-rules">
+    <div class="rules-grid">
+      <div class="card rule-card">
+        <h2>场地与时间</h2>
+        <table class="kv">
+          <tr><th>场地</th><td>220 cm（宽）× 120 cm（深）</td></tr>
+          <tr><th>引导线</th><td>黑色，宽 2–3 cm（图上 2.5 cm）</td></tr>
+          <tr><th>基地</th><td>30 × 30 cm，底部中央</td></tr>
+          <tr><th>模型位</th><td>01–10，贴四边；模型区 16×8 或 8×16 cm</td></tr>
+          <tr><th>单场</th><td><b>180 秒</b></td></tr>
+          <tr><th>赛前准备</th><td><b>90 分钟</b>（现场任务此时公布）</td></tr>
+          <tr><th>机器人</th><td>出发前 ≤ 30×30×30 cm；≤ 4 个电机；禁数字舵机；塑料拼插；电池 ≤ 9V</td></tr>
+        </table>
+      </div>
+
+      <div class="card rule-card">
+        <h2>计分表</h2>
+        <table class="kv">
+          <tr><th>出发</th><td>30</td></tr>
+          <tr><th>返回基地</th><td>30</td></tr>
+          <tr><th>扶起老人</th><td>50</td></tr>
+          <tr><th>自动取药</th><td>50（落药）+ 50（带回基地）</td></tr>
+          <tr><th>用药提醒</th><td>50（开盖 &gt;90°）+ 50（放入药丸）</td></tr>
+          <tr><th>活动健身</th><td>50</td></tr>
+          <tr><th>现场任务 ×3</th><td>各 100</td></tr>
+          <tr><th>自主运行奖励</th><td>40 − 10 × 重启次数（≥ 0）</td></tr>
+        </table>
+        <p class="tiny-note">满分示例：600（任务）+ 30 + 30 + 40 = <b>700</b> 分。</p>
+      </div>
+
+      <div class="card rule-card wide">
+        <h2>场地结构：3 段线网，靠基地/脱线连接</h2>
+        <div class="net-grid">
+          <div class="net-box left">
+            <h3>左网（经 V6 接基地）</h3>
+            <p>10 → 01/02/03 主横线 → 03 竖线 → 中部横线 → V6 → 基地。</p>
+            <p class="tiny-note">可从基地沿黑线进入。</p>
+          </div>
+          <div class="net-box right">
+            <h3>右网（F01 脱线进入）</h3>
+            <p>04 → V4 竖线 → 05 / 06 两个路口 → 07；只有一条竖线 + 两条横线。</p>
+            <p class="tiny-note">基地→07 脱线 62.0 cm。</p>
+          </div>
+          <div class="net-box branch">
+            <h3>08-09 支线（F02 脱线进入）</h3>
+            <p>09 → J09 → 08；它和左网/右网都没有黑线相连。</p>
+            <p class="tiny-note">基地→08 脱线 50.3 cm。</p>
+          </div>
+        </div>
+        <p class="tiny-note">所以路线天然分成“多趟”：左网 / 右网 / 08-09 支线之间的任何转场都要经过基地。不要把“两网不连通”理解成只有左/右两个线网——准确说是 3 段线网 + 1 条基地段。</p>
+      </div>
+
+      <div class="card rule-card">
+        <h2>模型朝向（红色箭头）</h2>
+        <table class="kv">
+          <tr><th>01–04（上边）</th><td>270°（朝场内 / 向下）<span class="tag warn">推断，现场确认</span></td></tr>
+          <tr><th>05 / 06（右边）</th><td>180°（朝场内 / 向左）</td></tr>
+          <tr><th>07 / 08（下边）</th><td>90°（朝场内 / 向上）</td></tr>
+          <tr><th>09 / 10（左边）</th><td>0°（朝场内 / 向右）</td></tr>
+        </table>
+        <p class="tiny-note">红色箭头只有约 1.5 cm，图上难以判读方向；01–04 是按“红标记在模型区靠场内一侧”推断的。比赛现场以实物为准。</p>
+      </div>
+
+      <div class="card rule-card">
+        <h2>读数与计分口径</h2>
+        <ul class="bullets">
+          <li>出发 30：按“第一次离场”计一次；返回 30：按“最后一次回基地”计一次（我们的理解，需裁判确认）。</li>
+          <li>自主奖励：40 − 10 × 重启次数，最低 0；重启次数越多，奖励越少。</li>
+          <li>自动取药/用药提醒的 +50 必须满足“药丸随机器人回到基地”的交付条件。</li>
+          <li>现场任务在赛前 90 分钟公布，动作与得分条件以现场公布为准。</li>
+        </ul>
+      </div>
+
+      <div class="card rule-card">
+        <h2>安全与检查</h2>
+        <ul class="bullets">
+          <li>出发前机器人不得超过 30×30×30 cm，电机不超过 4 个。</li>
+          <li>第一次试跑先架空轮子，手放在电源开关附近。</li>
+          <li>车上程序要有超时保护：超时先停车，再回基地。</li>
+          <li>模型动作（推杆/开盖/扶起/转柄）先确认限位，再上速度。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 数据与来源 ============================ -->
+  <section class="tab-panel" id="panel-data">
+    <div class="two-col">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2>地图数据</h2>
+            <p>单位 cm；原点在场地左下角，x 向右、y 向上。数据真值源是 <code>data/map_spec.json</code>。</p>
+          </div>
+          <div class="head-actions">
+            <button class="mini-btn" id="download-spec" type="button">下载 map_spec.json</button>
+            <button class="mini-btn" id="download-assignment" type="button">导出当前分配</button>
+          </div>
+        </div>
+        <div class="data-stats">
+          <div><b>22</b><span>节点</span></div>
+          <div><b>21</b><span>边</span></div>
+          <div><b>10</b><span>模型位</span></div>
+          <div><b>23</b><span>实测参数</span></div>
+        </div>
+        <h3 class="subhead">节点（22）</h3>
+        <div class="table-wrap short"><table class="data-table"><thead><tr><th>节点</th><th>类型</th><th>x</th><th>y</th><th>说明</th></tr></thead><tbody id="node-table-body"></tbody></table></div>
+        <h3 class="subhead">边（21）</h3>
+        <div class="table-wrap short"><table class="data-table"><thead><tr><th>边</th><th>两端</th><th>类型</th><th>长度 cm</th></tr></thead><tbody id="edge-table-body"></tbody></table></div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-head"><div><h2>23 个实测参数复核</h2><p>实测值 vs 几何真值；规划以几何为准</p></div></div>
+          <div class="param-summary">
+            <span class="pill grade-正常">正常 13</span>
+            <span class="pill grade-警告">警告 5</span>
+            <span class="pill grade-错误">错误 4</span>
+            <span class="pill grade-待确认">待确认 1</span>
+          </div>
+          <div class="table-wrap tall">
+            <table class="data-table compact-table">
+              <thead><tr><th>#</th><th>描述</th><th>实测</th><th>几何</th><th>差</th><th>等级</th></tr></thead>
+              <tbody id="param-table-body"></tbody>
+            </table>
+          </div>
+          <p class="tiny-note">完整报告（含图上实测、feature、备注）见 <a href="docs/参数差异报告.md">docs/参数差异报告.md</a>。</p>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h2>数据从哪来</h2></div></div>
+          <ul class="bullets">
+            <li><b>几何：</b>官方场地图 <code>地图.jpg</code> 像素标定 5.641 px/cm；边界 x=11..1252、y=8..685 → 220×120 cm。</li>
+            <li><b>复核：</b>11 条粗线中心、13 个节点、基地外沿、10 个模型区与图差 ≤ 0.2 cm。</li>
+            <li><b>23 个实测参数：</b>13 正常 / 5 警告 / 4 错误 / 1 待确认；偏差多来自“从粗线内边缘量”少一个线宽，或按旧版 200×100 场地量。</li>
+            <li><b>模型朝向：</b>05–10 与图自洽；01–04 是推断，现场确认。</li>
+            <li><b>计分：</b>按赛规与公开资料整理；出发/返回/自主奖励的判定细节以裁判现场解释为准。</li>
+          </ul>
+          <div class="link-row">
+            <a class="link-btn" href="docs/场地几何.md">场地几何说明</a>
+            <a class="link-btn" href="docs/赛规速查.md">赛规速查</a>
+            <a class="link-btn" href="assets/2026年赛规.pdf">官方赛规 PDF</a>
+            <a class="link-btn" href="assets/地图标注结果.jpg">23 参数原图</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div>WER 2026 普及赛 · 伙伴机器人 · 赛规 &amp; 场地小助手</div>
+  <div class="muted">底图与赛规版权归赛事主办方；本页面仅用于本队学习与比赛准备。</div>
+</footer>
+
+<noscript><div class="noscript">这个页面需要 JavaScript 才能显示地图与计分。</div></noscript>
+
+<script src="data/map-data.js"></script>
+<script src="data/params.js"></script>
+<script src="data/tasks.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
